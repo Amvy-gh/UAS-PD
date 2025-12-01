@@ -24,9 +24,9 @@ def main(filepath: str):
 
     # 3. Detect outliers
     detector = OutlierDetector(df_ready)
-    df_labeled = detector.detect(contamination=0.02)
+    df_labeled = detector.detect()
 
-    # 4. Visualize
+    # 4. Visualize  
     viz = Visualizer(df_labeled)
     viz.plot_outlier_steps()
 

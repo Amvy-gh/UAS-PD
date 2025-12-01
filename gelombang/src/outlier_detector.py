@@ -9,25 +9,48 @@ class OutlierDetector:
         self.target_col = target_col
         self.model: Optional[IsolationForest] = None
 
-    def detect(self, contamination: float = 0.02, n_estimators: int = 300, random_state: int = 42) -> pd.DataFrame:
+    def detect(
+        self, 
+        n_estimators: int = 300,
+        random_state: int = 42
+    ) -> pd.DataFrame:
+        """
+        Jurnal cyber tidak menggunakan contamination tetap.
+        Threshold ditentukan dari distribusi anomaly score:
+        
+        threshold = mean(score) + 2 * std(score)
+        """
         X = self.df.drop(columns=[self.target_col])
+
+        # train model tanpa contamination
         self.model = IsolationForest(
             n_estimators=n_estimators,
-            max_samples='auto',
-            contamination=contamination,
+            contamination='auto',   # auto hanya untuk decision_function, bukan mark outlier
             random_state=random_state,
             n_jobs=-1
         )
-        preds = self.model.fit_predict(X)
-        # fit_predict: -1 outlier, 1 normal
-        self.df['is_outlier'] = np.where(preds == -1, 1, 0)
-        # attach anomaly score
-        try:
-            self.df['anomaly_score'] = -self.model.decision_function(X)  # higher -> more anomalous
-        except Exception:
-            self.df['anomaly_score'] = np.nan
+
+        # fit model
+        self.model.fit(X)
+
+        # anomaly score (semakin tinggi semakin aneh)
+        scores = -self.model.decision_function(X)
+        self.df['anomaly_score'] = scores
+
+        # --- Sesuai jurnal: adaptive threshold ---
+        mu = scores.mean()
+        sigma = scores.std()
+        threshold = mu + 2 * sigma
+
+        print(f" - Adaptive Threshold (μ + 2σ): {threshold:.4f}")
+
+        # outlier: score di atas threshold
+        self.df['is_outlier'] = (scores > threshold).astype(int)
+
+        # laporan jumlah
         num_outliers = int(self.df['is_outlier'].sum())
-        print(f" - Detected {num_outliers} outliers ({num_outliers/len(self.df)*100:.2f}%)")
+        print(f" - Detected {num_outliers} outliers ({num_outliers / len(self.df) * 100:.2f}%)")
+
         return self.df
 
     def remove_outliers(self) -> pd.DataFrame:

@@ -29,7 +29,7 @@ class Visualizer:
         plt.subplot(1, 3, 2)
         plt.title('2. Hasil Deteksi iForest')
         sns.scatterplot(data=df_sample, x=x_col, y=y_col, hue='is_outlier', palette={0:'blue',1:'red'}, alpha=0.6, s=15)
-
+    
         # 3. Cleaned
         df_clean = df_sample[df_sample['is_outlier'] == 0]
         plt.subplot(1, 3, 3)

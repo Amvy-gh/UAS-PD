@@ -1,0 +1,24 @@
+--- Implementation Results ---
+Total Outliers (Ground Truth): 39601 out of 474468
+Selected Features: ['NILAI_MSK', 'NILAI_KLR', 'NAMA_PRODUK_encoded', 'UNIT_encoded']
+Contamination Rate: 0.0835
+
+Confusion Matrix:
+[[399536  35331]
+ [ 35338   4263]]
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.92      0.92      0.92    434867
+           1       0.11      0.11      0.11     39601
+
+    accuracy                           0.85    474468
+   macro avg       0.51      0.51      0.51    474468
+weighted avg       0.85      0.85      0.85    474468
+
+
+--- Step 4: Outlier Removal & Classification Simulation ---
+Original size: 474468, Cleaned size: 434874
+Removed 39594 instances.
+Remaining Stock Errors in Cleaned Dataset: 35338

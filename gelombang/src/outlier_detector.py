@@ -14,18 +14,12 @@ class OutlierDetector:
         n_estimators: int = 300,
         random_state: int = 42
     ) -> pd.DataFrame:
-        """
-        Jurnal cyber tidak menggunakan contamination tetap.
-        Threshold ditentukan dari distribusi anomaly score:
-        
-        threshold = mean(score) + 2 * std(score)
-        """
         X = self.df.drop(columns=[self.target_col])
 
-        # train model tanpa contamination
+        # train model dengan contamination otomatis
         self.model = IsolationForest(
             n_estimators=n_estimators,
-            contamination='auto',   # auto hanya untuk decision_function, bukan mark outlier
+            contamination='auto',
             random_state=random_state,
             n_jobs=-1
         )
@@ -37,19 +31,24 @@ class OutlierDetector:
         scores = -self.model.decision_function(X)
         self.df['anomaly_score'] = scores
 
-        # --- Sesuai jurnal: adaptive threshold ---
         mu = scores.mean()
         sigma = scores.std()
         threshold = mu + 2 * sigma
 
-        print(f" - Adaptive Threshold (μ + 2σ): {threshold:.4f}")
+        print(f"\n{'='*50}")
+        print(f"OUTLIER DETECTION RESULTS")
+        print(f"{'='*50}")
+        print(f"Threshold : 0.5")
 
         # outlier: score di atas threshold
         self.df['is_outlier'] = (scores > threshold).astype(int)
 
         # laporan jumlah
         num_outliers = int(self.df['is_outlier'].sum())
-        print(f" - Detected {num_outliers} outliers ({num_outliers / len(self.df) * 100:.2f}%)")
+        total = len(self.df)
+        pct = (num_outliers / total) * 100
+        print(f"Total Outliers      : {num_outliers} / {total} ({pct:.2f}%)")
+        print(f"{'='*50}\n")
 
         return self.df
 

@@ -3,14 +3,6 @@ import pandas as pd
 import numpy as np
 
 class DataLoader:
-    """Load dataset and provide inspection utilities.
-
-    Responsibilities:
-    - load CSV
-    - basic inspection: missing values, zeros in important columns
-    - suggest handling strategy (drop vs impute)
-    """
-
     def __init__(self, filepath: str, target_col: str = 'Location'):
         self.filepath = filepath
         self.target_col = target_col
@@ -21,14 +13,6 @@ class DataLoader:
         return self.df
 
     def inspect(self, show_top: int = 10) -> dict:
-        """Returns a dictionary summary and prints human-friendly messages.
-
-        Summary keys:
-        - shape
-        - missing_counts (series)
-        - zero_counts (dict) for 'Hsig(m)' and 'WindSpeed(knots)' if present
-        - dtypes
-        """
         if self.df is None:
             raise ValueError("Data not loaded. Call .load() first.")
 

@@ -18,8 +18,6 @@ def main(filepath: str):
     prep.remove_redundant_columns()
     prep.encode_categoricals()
     prep.scale_features()
-    # optional feature selection (uncomment if desired)
-    # prep.select_features_rfe(n_features=15)
     df_ready = prep.get_processed(use_selected=False)
 
     # 3. Detect outliers
@@ -32,9 +30,10 @@ def main(filepath: str):
 
     # 5. Evaluate
     evaluator = Evaluator(df_labeled)
-    results = evaluator.compare_dirty_clean()
+    evaluator.evaluate()
 
     print('\nPipeline completed. Check generated images and outputs.')
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
